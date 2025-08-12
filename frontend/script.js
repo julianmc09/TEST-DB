@@ -2,7 +2,6 @@
 const API_BASE_URL = 'http://localhost:3000';
 
 // Global variables
-let currentUser = null;
 let clients = [];
 let invoices = [];
 let transactions = [];
@@ -10,44 +9,43 @@ let transactions = [];
 // Application initialization
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
-    checkAuthStatus();
+    showMainApp();
+    showSection('dashboard');
 });
 
 // Event listeners
 function setupEventListeners() {
-   
-    // Form CRUD
+    // Form CRUD for clients
     document.getElementById('userFormData').addEventListener('submit', handleUserSubmit);
 }
-
-// Authentication status
-function checkAuthStatus() {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-        showMainApp();
-    }
-}
-
 
 // Show main application
 function showMainApp() {
     document.getElementById('mainContainer').style.display = 'block';
 }
 
-
-
 // Navigation between sections
 function showSection(sectionName) {
-
-    console.log(sectionName);
+    console.log('Showing section:', sectionName);
     
-    // Hide sections
+    // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
     });
     
-    // Show section
+    // Show selected section
     document.getElementById(sectionName).classList.add('active');
+    
+    // Update navigation active state
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Find the clicked link and make it active
+    const clickedLink = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+    if (clickedLink) {
+        clickedLink.classList.add('active');
+    }
     
     // Load data according to section
     switch(sectionName) {
@@ -55,7 +53,7 @@ function showSection(sectionName) {
             loadDashboardData();
             break;
         case 'clients':
-            loadUsers();
+            loadClients();
             break;
         case 'invoices':
             loadInvoices();
@@ -69,168 +67,179 @@ function showSection(sectionName) {
 // Load dashboard
 async function loadDashboardData() {
     try {
-        const [clientCount, invoicesCount, TransactionsCount] = await Promise.all([
-            fetch(`${API_BASE_URL}/clients/count`).then(r => r.json()).catch(() => ({ count: 0 })),
-            fetch(`${API_BASE_URL}/invoices/count`).then(r => r.json()).catch(() => ({ count: 0 })),
-            fetch(`${API_BASE_URL}/transactions/count`).then(r => r.json()).catch(() => ({ count: 0 }))
+        // Load all data for dashboard
+        await Promise.all([
+            loadClients(),
+            loadInvoices(),
+            loadTransactions()
         ]);
-        
-        document.getElementById('totalClients').textContent = clientCount.count || 0;
-        document.getElementById('totalInvoices').textContent = invoicesCount.count || 0;
-        document.getElementById('totalTransactions').textContent = TransactionsCount.count || 0;
     } catch (error) {
         console.error('Error loading Dashboard:', error);
-        
-        document.getElementById('totalClients').textContent = '0';
-        document.getElementById('totalInvoices').textContent = '0';
-        document.getElementById('totalTransactions').textContent = '0';
     }
 }
 
+// ===== CLIENTS FUNCTIONS =====
 
-// Load client
-async function loadUsers() {
+// Load clients
+async function loadClients() {
     try {
         const response = await fetch(`${API_BASE_URL}/clients`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        users = await response.json();
-        displayUsers();
+        clients = await response.json();
+        displayClients();
     } catch (error) {
-        console.error('Error loading users:', error);
-        
+        console.error('Error loading clients:', error);
         const tbody = document.getElementById('usersTableBody');
         tbody.innerHTML = `
             <tr>
-                <td colspan="4" class="text-center text-danger">
-                    Error loading users: ${error.message}
+                <td colspan="7" class="text-center text-danger">
+                    Error loading clients: ${error.message}
                 </td>
             </tr>
         `;
     }
 }
 
-// Show users in the table
-function displayUsers() {
+// Display clients in table
+function displayClients() {
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '';
     
-    users.forEach(user => {
+    if (clients.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    No clients found. Add your first client!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    clients.forEach(client => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${clients.identification_number}</td>
-            <td>${clients.client_name}</td>
-            <td>${clients.address}</td>
-            <td>${clients.apartment}</td>
-            <td>${clients.phone}</td>
-            <td>${clients.email}</td>
-            
+            <td>${client.identification_number}</td>
+            <td>${client.client_name}</td>
+            <td>${client.address}</td>
+            <td>${client.apartment}</td>
+            <td>${client.phone}</td>
+            <td>${client.email}</td>
             <td>
-                <button class="btn btn-sm btn-warning" onclick="editUser(${clients.identification_number})">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteUser(${clients.identification_number})">Delete</button>
+                <button class="btn btn-sm btn-warning" onclick="editClient('${client.identification_number}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteClient('${client.identification_number}')">Delete</button>
             </td>
         `;
         tbody.appendChild(row);
     });
 }
 
-// Show user form
-function showUserForm(userId = null) {
+// Show client form
+function showUserForm(clientId = null) {
     const form = document.getElementById('userForm');
     const formData = document.getElementById('userFormData');
     
-    if (userId) {
-        const user = clients.find(u => u.identification_number === userId);
-        if (user) {
-            document.getElementById('userId').value = user.identification_number;
-            document.getElementById('userName').value = user.client_name;
-            document.getElementById('userAddress').value = user.address;
-            document.getElementById('userApartment').value = user.apartment;
-            document.getElementById('userPhone').value = user.phone;
-            document.getElementById('userEmail').value = user.email;
-
+    if (clientId) {
+        const client = clients.find(c => c.identification_number === clientId);
+        if (client) {
+            document.getElementById('userIdent').value = client.identification_number;
+            document.getElementById('userName').value = client.client_name;
+            document.getElementById('userAddress').value = client.address;
+            document.getElementById('userApartment').value = client.apartment;
+            document.getElementById('userPhone').value = client.phone;
+            document.getElementById('userEmail').value = client.email;
         }
     } else {
         formData.reset();
-        document.getElementById('userId').value = '';
+        document.getElementById('userIdent').value = '';
     }
     
     form.style.display = 'block';
 }
 
-// Cancel user form
+// Cancel client form
 function cancelUserForm() {
     document.getElementById('userForm').style.display = 'none';
     document.getElementById('userFormData').reset();
 }
 
-// Handle user form submission
+// Handle client form submission
 async function handleUserSubmit(e) {
     e.preventDefault();
     
-    const userId = document.getElementById('userId').value;
-    const name = document.getElementById('userName').value;
+    const identification_number = document.getElementById('userIdent').value;
+    const client_name = document.getElementById('userName').value;
     const address = document.getElementById('userAddress').value;
     const apartment = document.getElementById('userApartment').value;
     const phone = document.getElementById('userPhone').value;
     const email = document.getElementById('userEmail').value;
 
+    // Check if this is an edit or create operation
+    const isEdit = clients.some(c => c.identification_number === identification_number);
     
     try {
-        const url = userId ? `${API_BASE_URL}/clients/${userId}` : `${API_BASE_URL}/clients`;
-        const method = userId ? 'PUT' : 'POST';
-        
+        const url = isEdit ? `${API_BASE_URL}/clients/${identification_number}` : `${API_BASE_URL}/clients`;
+        const method = isEdit ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
             method,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify({
+                identification_number,
+                client_name,
+                address,
+                apartment,
+                phone,
+                email
+            })
         });
         
         if (response.ok) {
-            alert(userId ? 'User updated' : 'Created user');
+            alert(isEdit ? 'Client updated successfully!' : 'Client created successfully!');
             cancelUserForm();
-            loadUsers();
+            loadClients();
         } else {
             const error = await response.json();
-            alert(error.message || 'Error saving user');
+            alert(error.message || 'Error saving client');
         }
     } catch (error) {
-        console.error('Error saving user:', error);
-        alert('Error saving user');
+        console.error('Error saving client:', error);
+        alert('Error saving client');
     }
 }
 
-// Edit user
-function editUser(userId) {
-    showUserForm(userId);
+// Edit client
+function editClient(clientId) {
+    showUserForm(clientId);
 }
 
-// Delete user
-async function deleteUser(userId) {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+// Delete client
+async function deleteClient(clientId) {
+    if (!confirm('Are you sure you want to delete this client?')) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/clients/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/clients/${clientId}`, {
             method: 'DELETE'
         });
         
         if (response.ok) {
-            alert('User deleted');
-            loadUsers();
+            alert('Client deleted successfully!');
+            loadClients();
         } else {
-            alert('Error deleted user');
+            const error = await response.json();
+            alert(error.message || 'Error deleting client');
         }
     } catch (error) {
-        console.error('Error deleted user:', error);
-        alert('Error deleted user');
+        console.error('Error deleting client:', error);
+        alert('Error deleting client');
     }
 }
 
-
+// ===== INVOICES FUNCTIONS =====
 
 // Load invoices
 async function loadInvoices() {
@@ -243,89 +252,104 @@ async function loadInvoices() {
         displayInvoices();
     } catch (error) {
         console.error('Error loading invoices:', error);
-        // Error in table
-        const tbody = document.getElementById('productsTableBody');
+        const tbody = document.getElementById('invoicesTableBody');
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-danger">
-                    Error cargando productos: ${error.message}
+                <td colspan="6" class="text-center text-danger">
+                    Error loading invoices: ${error.message}
                 </td>
             </tr>
         `;
     }
 }
 
-// Show invoices in table
+// Display invoices in table
 function displayInvoices() {
-    const tbody = document.getElementById('productsTableBody');
+    const tbody = document.getElementById('invoicesTableBody');
     tbody.innerHTML = '';
     
-    products.forEach(product => {
+    if (invoices.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">
+                    No invoices found. Import some data to get started!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    invoices.forEach(invoice => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${invoices.invoice_number}</td>
-            <td>${invoices.platform_used}</td>
-            <td>${invoices.billing_period}</td>
-            <td>${invoices.invoiced_amount}</td>
-            <td>${invoices.paid_amount}</td>
-            <td>${invoices.identification_number}</td>
-            
+            <td>${invoice.invoice_number}</td>
+            <td>${invoice.platform_used}</td>
+            <td>${invoice.billing_period}</td>
+            <td>$${parseFloat(invoice.invoiced_amount).toFixed(2)}</td>
+            <td>$${parseFloat(invoice.paid_amount).toFixed(2)}</td>
+            <td>${invoice.identification_number}</td>
         `;
         tbody.appendChild(row);
     });
 }
 
+// ===== TRANSACTIONS FUNCTIONS =====
 
-
-// Load Transactions
+// Load transactions
 async function loadTransactions() {
     try {
         const response = await fetch(`${API_BASE_URL}/transactions`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        purchases = await response.json();
+        transactions = await response.json();
         displayTransactions();
     } catch (error) {
-        console.error('Error load transactions:', error);
-        // Error in table
-        const tbody = document.getElementById('purchasesTableBody');
+        console.error('Error loading transactions:', error);
+        const tbody = document.getElementById('transactionsTableBody');
         tbody.innerHTML = `
             <tr>
                 <td colspan="6" class="text-center text-danger">
-                    Error cargando compras: ${error.message}
+                    Error loading transactions: ${error.message}
                 </td>
             </tr>
         `;
     }
 }
 
-
-// Show transaction in table
+// Display transactions in table
 function displayTransactions() {
-    const tbody = document.getElementById('purchasesTableBody');
+    const tbody = document.getElementById('transactionsTableBody');
     tbody.innerHTML = '';
     
-    purchases.forEach(purchase => {
+    if (transactions.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">
+                    No transactions found. Import some data to get started!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    transactions.forEach(transaction => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${transactions.transaction_id}</td>
-            <td>${transactions.trasanction_date}</td>
-            <td>${transactions.transaction_amount}</td>
-            <td>${transactions.transaction_status}</td>
-            <td>${transactions.transaction_type}</td>
-            <td>${transactions.invoice_number}</td>
-
-
-            
+            <td>${transaction.transaction_id}</td>
+            <td>${new Date(transaction.transaction_date).toLocaleDateString()}</td>
+            <td>$${parseFloat(transaction.transaction_amount).toFixed(2)}</td>
+            <td>${transaction.transaction_status}</td>
+            <td>${transaction.transaction_type}</td>
+            <td>${transaction.invoice_number}</td>
         `;
         tbody.appendChild(row);
     });
 }
 
+// ===== CSV IMPORT FUNCTIONS =====
 
-
-// Function for import CSV
+// Function for importing CSV
 async function importCSV(file, targetTable) {
     try {
         const reader = new FileReader();
@@ -363,15 +387,15 @@ async function importCSV(file, targetTable) {
         };
         reader.readAsText(file);
     } catch (error) {
-        console.error('Error in CSV:', error);
-        alert('ErroR IN CSV');
+        console.error('Error processing CSV:', error);
+        alert('Error processing CSV file');
     }
 }
 
 // Validate headers according to table
 function validateHeaders(headers, table) {
     const requiredHeaders = {
-        'clients': ['identification_number', 'client_name', 'address', 'apartment', 'phone', 'email'],
+        'clients': ['client_name', 'identification_number', 'address', 'apartment', 'phone', 'email'],
         'invoices': ['invoice_number', 'platform_used', 'billing_period', 'invoiced_amount', 'paid_amount', 'identification_number'],
         'transactions': ['transaction_id', 'transaction_date', 'transaction_amount', 'transaction_status', 'transaction_type', 'invoice_number']
     };
@@ -400,7 +424,7 @@ async function sendDataToBackend(data, table) {
             // Reload the corresponding section
             switch(table) {
                 case 'clients':
-                    loadUsers();
+                    loadClients();
                     break;
                 case 'invoices':
                     loadInvoices();
@@ -409,16 +433,13 @@ async function sendDataToBackend(data, table) {
                     loadTransactions();
                     break;
             }
-            
-            // Update dashboard
-            loadDashboardData();
         } else {
             const error = await response.json();
             alert(`❌ Error: ${error.message}`);
         }
     } catch (error) {
         console.error('Error sending data:', error);
-        alert('Error sending data');
+        alert('Error sending data to server');
     }
 }
 
@@ -436,18 +457,18 @@ function closeImportModal() {
     document.getElementById('targetTable').value = '';
 }
 
-// Manage import
+// Handle import
 function handleImport() {
     const fileInput = document.getElementById('csvFile');
     const tableSelect = document.getElementById('targetTable');
     
     if (!fileInput.files[0]) {
-        alert('Select a CSV file');
+        alert('Please select a CSV file');
         return;
     }
     
     if (!tableSelect.value) {
-        alert('Select a table');
+        alert('Please select a target table');
         return;
     }
     
@@ -456,98 +477,10 @@ function handleImport() {
     
     // Validate extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
-        alert('Select a valid file');
+        alert('Please select a valid CSV file');
         return;
     }
     
     importCSV(file, targetTable);
     closeImportModal();
 }
-
-
-// Functions of clients
-export const clientAPI = {
-    // Get all clients
-    getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/clients`);
-        return response.json();
-    },
-
-    // Get client by Id
-    getById: async (identification_number) => {
-        const response = await fetch(`${API_BASE_URL}/clients/${identification_number}`);
-        return response.json();
-    },
-
-    // New client
-    create: async (clientData) => {
-        const response = await fetch(`${API_BASE_URL}/clients`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(clientData)
-        });
-        return response.json();
-    },
-
-    // Update client
-    update: async (identification_number, clientData) => {
-        const response = await fetch(`${API_BASE_URL}/clients/${identification_number}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(clientData)
-        });
-        return response.json();
-    },
-
-    // Delete client
-    delete: async (identification_number) => {
-        const response = await fetch(`${API_BASE_URL}/users/${identification_number}`, {
-            method: 'DELETE'
-        });
-        return response.json();
-    },
-
-};
-
-// Functions of import CSV
-export const importAPI = {
-    // Import clients
-    clients: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/import/clients`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data })
-        });
-        return response.json();
-    },
-
-    // Import invoices
-    products: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/import/invoices`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data })
-        });
-        return response.json();
-    },
-
-    // Import transactions
-    purchases: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/import/transactions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data })
-        });
-        return response.json();
-    }
-};

@@ -34,26 +34,26 @@
                     <div class="stat-card stat-primary">
                         <div class="stat-content">
                             <h3>Clients</h3>
-                            <p class="card-text" id="totalClients">0</p>
+                            <p class="card-text">Manage your clients</p>
                         </div>
                     </div>
                     <div class="stat-card stat-success">
                         <div class="stat-content">
                             <h3>Invoices</h3>
-                            <p class="card-text" id="totalInvoices">0</p>
+                            <p class="card-text">View your invoices</p>
                         </div>
                     </div>
                     <div class="stat-card stat-info">
                         <div class="stat-content">
                             <h3>Transactions</h3>
-                            <p class="card-text" id="totalTransactions">0</p>
+                            <p class="card-text">Track your transactions</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Clients section -->
-            <div id="users" class="section">
+            <div id="clients" class="section">
                 <div class="section-header">
                     <h2>Customer management</h2>
                     <button class="btn btn-primary" onclick="showUserForm()">Add client</button>
@@ -66,7 +66,7 @@
                         <input type="hidden" id="userId">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="userName">Identification number</label>
+                                <label for="userIdent">Identification number</label>
                                 <input type="text" id="userIdent" required>
                             </div>
                             <div class="form-group">
@@ -89,7 +89,6 @@
                                 <label for="userEmail">Email</label>
                                 <input type="email" id="userEmail" required>
                             </div>
-
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-success">Save</button>
@@ -109,6 +108,7 @@
                                 <th>Apartment</th>
                                 <th>Phone</th>
                                 <th>Email</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
@@ -117,13 +117,12 @@
                 </div>
             </div>
 
-            <!-- Sección de Productos -->
-            <div id="products" class="section">
+            <!-- Invoices section -->
+            <div id="invoices" class="section">
                 <div class="section-header">
                     <h2>Invoice management</h2>
                 </div>
                 
-        
                 <!-- Table of invoices -->
                 <div class="table-container">
                     <table class="data-table">
@@ -132,36 +131,37 @@
                                 <th>Invoice number</th>
                                 <th>Platform used</th>
                                 <th>Billing period</th>
-                                <th>invoiced amount</th>
+                                <th>Invoiced amount</th>
                                 <th>Paid amount</th>
-                                <th>Identification of client</th>
+                                <th>Client ID</th>
                             </tr>
                         </thead>
-                        <tbody id="productsTableBody">
+                        <tbody id="invoicesTableBody">
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!--Transactions section -->
-            <div id="purchases" class="section">
+            <!-- Transactions section -->
+            <div id="transactions" class="section">
                 <div class="section-header">
                     <h2>Transactions management</h2>
+                </div>
                 
                 <!-- Table of transactions -->
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Transaction id</th>
-                                <th>Date of transaction</th>
-                                <th>Transaction amount</th>
-                                <th>transaction status</th>
-                                <th>transaction type</th>
+                                <th>Transaction ID</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Type</th>
                                 <th>Invoice number</th>
                             </tr>
                         </thead>
-                        <tbody id="purchasesTableBody">
+                        <tbody id="transactionsTableBody">
                         </tbody>
                     </table>
                 </div>
@@ -178,24 +178,24 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="csvFile">Select csv:</label>
+                    <label for="csvFile">Select CSV file:</label>
                     <input type="file" id="csvFile" accept=".csv" required>
                 </div>
                 <div class="form-group">
                     <label for="targetTable">Target table:</label>
                     <select id="targetTable" required>
                         <option value="">Select table</option>
-                        <option value="users">Clients</option>
-                        <option value="products">Invoices</option>
-                        <option value="purchases">Transactions</option>
+                        <option value="clients">Clients</option>
+                        <option value="invoices">Invoices</option>
+                        <option value="transactions">Transactions</option>
                     </select>
                 </div>
                 <div class="modal-info">
                     <h4>📋 Format required by table:</h4>
                     <div class="format-info">
-                        <strong>Clients:</strong> Identification_number, name, address, apartment, phone, email<br>
-                        <strong>Invoices:</strong> Invoice_number, platform used, billing period, invoiced amount, paid amount, indentification of client<br>
-                        <strong>Transactions:</strong> Transaction_id, transaction date, transaction amount, transaction status, transaction type, number of invoice
+                        <strong>Clients:</strong> client_name, identification_number, address, apartment, phone, email<br>
+                        <strong>Invoices:</strong> invoice_number, platform_used, billing_period, invoiced_amount, paid_amount, identification_number<br>
+                        <strong>Transactions:</strong> transaction_id, transaction_date, transaction_amount, transaction_status, transaction_type, invoice_number
                     </div>
                 </div>
             </div>
