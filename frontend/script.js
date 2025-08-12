@@ -78,8 +78,6 @@ async function loadDashboardData() {
     }
 }
 
-// ===== CLIENTS FUNCTIONS =====
-
 // Load clients
 async function loadClients() {
     try {
@@ -239,8 +237,6 @@ async function deleteClient(clientId) {
     }
 }
 
-// ===== INVOICES FUNCTIONS =====
-
 // Load invoices
 async function loadInvoices() {
     try {
@@ -293,7 +289,6 @@ function displayInvoices() {
     });
 }
 
-// ===== TRANSACTIONS FUNCTIONS =====
 
 // Load transactions
 async function loadTransactions() {
@@ -347,7 +342,6 @@ function displayTransactions() {
     });
 }
 
-// ===== CSV IMPORT FUNCTIONS =====
 
 // Function for importing CSV
 async function importCSV(file, targetTable) {

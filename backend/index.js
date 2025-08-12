@@ -28,7 +28,6 @@ db.connect((err, client, release) => {
   }
 });
 
-// ===== CLIENTS ENDPOINTS =====
 
 // Get all clients
 app.get('/clients', async (req, res) => {
@@ -116,7 +115,6 @@ app.delete('/clients/:identification_number', async (req, res) => {
     }
 });
 
-// ===== INVOICES ENDPOINTS =====
 
 // Get all invoices
 app.get('/invoices', async (req, res) => {
@@ -129,7 +127,6 @@ app.get('/invoices', async (req, res) => {
     }
 });
 
-// ===== TRANSACTIONS ENDPOINTS =====
 
 // Get all transactions
 app.get('/transactions', async (req, res) => {
@@ -142,7 +139,6 @@ app.get('/transactions', async (req, res) => {
     }
 });
 
-// ===== IMPORT ENDPOINTS =====
 
 // Import clients with CSV
 app.post('/import/clients', async (req, res) => {

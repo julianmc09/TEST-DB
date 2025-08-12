@@ -1,117 +1,117 @@
-# Sistema de Información Financiera
+# Financial Information System
 
-Una aplicación web completa para gestionar clientes, facturas y transacciones financieras.
+A complete web application to manage clients, invoices, and financial transactions.
 
-## Características
+## Features
 
-- **Dashboard**: Vista general del sistema
-- **Gestión de Clientes**: CRUD completo (Crear, Leer, Editar, Eliminar)
-- **Gestión de Facturas**: Visualización de facturas
-- **Gestión de Transacciones**: Visualización de transacciones
-- **Importación CSV**: Importar datos desde archivos CSV
+- **Dashboard**: System overview
+- **Client Management**: Full CRUD (Create, Read, Update, Delete)
+- **Invoice Management**: View invoices
+- **Transaction Management**: View transactions
+- **CSV Import**: Import data from CSV files
 
-## Instalación
+## Installation
 
 ### Backend
 
-1. Navega al directorio backend:
+1. Navigate to the backend directory:
 ```bash
 cd backend
 ```
 
-2. Instala las dependencias:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Ejecuta el servidor:
+3. Run the server:
 ```bash
 npm start
 ```
 
-El servidor estará disponible en `http://localhost:3000`
+The server will be available at `http://localhost:3000`
 
 ### Frontend
 
-1. Navega al directorio frontend:
+1. Navigate to the frontend directory:
 ```bash
 cd frontend
 ```
 
-2. Abre `index.html` en tu navegador web
+2. Open `index.html` in your web browser
 
-## Uso
+## Usage
 
-### Navegación
+### Navigation
 
-- **Dashboard**: Vista principal con resumen del sistema
-- **Clients**: Gestionar clientes (agregar, editar, eliminar)
-- **Invoices**: Ver facturas existentes
-- **Transactions**: Ver transacciones existentes
+- **Dashboard**: Main view with system summary
+- **Clients**: Manage clients (add, edit, delete)
+- **Invoices**: View existing invoices
+- **Transactions**: View existing transactions
 
-### Gestión de Clientes
+### Client Management
 
-1. Haz clic en "Add client" para agregar un nuevo cliente
-2. Completa el formulario con:
-   - Número de identificación
-   - Nombre del cliente
-   - Dirección
-   - Apartamento
-   - Teléfono
+1. Click on "Add client" to add a new client
+2. Fill in the form with:
+   - Identification number
+   - Client name
+   - Address
+   - Apartment
+   - Phone
    - Email
-3. Haz clic en "Save" para guardar
-4. Usa los botones "Edit" y "Delete" en la tabla para gestionar clientes existentes
+3. Click "Save" to store the client
+4. Use the "Edit" and "Delete" buttons in the table to manage existing clients
 
-### Importación CSV
+### CSV Import
 
-1. Haz clic en "Import CSV" en el dashboard
-2. Selecciona el archivo CSV
-3. Selecciona la tabla destino (clients, invoices, transactions)
-4. Haz clic en "Import"
+1. Click on "Import CSV" in the dashboard
+2. Select the CSV file
+3. Select the target table (clients, invoices, transactions)
+4. Click "Import"
 
-### Formato de Archivos CSV
+### CSV File Format
 
-#### Clientes
+#### Clients
 ```
 identification_number,client_name,address,apartment,phone,email
 123456789,John Doe,123 Main St,Apt 4A,555-0101,john.doe@email.com
 ```
 
-#### Facturas
+#### Invoices
 ```
 invoice_number,platform_used,billing_period,invoiced_amount,paid_amount,identification_number
 INV-001,Stripe,2024-01,150.00,150.00,123456789
 ```
 
-#### Transacciones
+#### Transactions
 ```
 transaction_id,transaction_date,transaction_amount,transaction_status,transaction_type,invoice_number
 TXN-001,2024-01-15,150.00,completed,payment,INV-001
 ```
 
-## Archivos de Ejemplo
+## Sample Files
 
-Se incluyen archivos CSV de ejemplo:
-- `sample-clients.csv`
-- `sample-invoices.csv`
-- `sample-transactions.csv`
+Sample CSV files are included:
+- `clients.csv`
+- `Invoicescsv`
+- `Transactions.csv`
 
-## Base de Datos
+## Database
 
-La aplicación utiliza PostgreSQL con las siguientes tablas:
-- `clients`: Información de clientes
-- `invoices`: Facturas emitidas
-- `transactions`: Transacciones realizadas
+The application uses PostgreSQL with the following tables:
+- `clients`: Client information
+- `invoices`: Issued invoices
+- `transactions`: Completed transactions
 
-## Tecnologías Utilizadas
+## Technologies Used
 
 - **Backend**: Node.js, Express, PostgreSQL
 - **Frontend**: HTML5, CSS3, JavaScript vanilla
-- **Base de Datos**: PostgreSQL
+- **Data Base**: PostgreSQL
 
-## Notas Importantes
+## Important Notes
 
-- Los clientes deben existir antes de crear facturas
-- Las facturas deben existir antes de crear transacciones
-- El sistema valida la integridad referencial automáticamente
-- Los archivos CSV deben tener el formato exacto especificado
+- Clients must exist before creating invoices
+- Invoices must exist before creating transactions
+- The system automatically enforces referential integrity
+- CSV files must match the exact specified format.
