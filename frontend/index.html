@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Soft</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- main-container -->
+    <div id="mainContainer" class="main-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">Financial information</div>
+                <div class="nav-menu">
+                    <a class="nav-link" href="#" onclick="showSection('dashboard')">Dashboard</a>
+                    <a class="nav-link" href="#" onclick="showSection('clients')">Clients</a>
+                    <a class="nav-link" href="#" onclick="showSection('invoices')">Invoices</a>
+                    <a class="nav-link" href="#" onclick="showSection('transactions')">Transactions</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <!-- Dashboard -->
+            <div id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <button class="btn btn-primary" onclick="showImportModal()">
+                        📁 Import CSV
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <div class="stat-content">
+                            <h3>Clients</h3>
+                            <p class="card-text" id="totalClients">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-success">
+                        <div class="stat-content">
+                            <h3>Invoices</h3>
+                            <p class="card-text" id="totalInvoices">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <div class="stat-content">
+                            <h3>Transactions</h3>
+                            <p class="card-text" id="totalTransactions">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients section -->
+            <div id="users" class="section">
+                <div class="section-header">
+                    <h2>Customer management</h2>
+                    <button class="btn btn-primary" onclick="showUserForm()">Add client</button>
+                </div>
+                
+                <!-- Form of client -->
+                <div id="userForm" class="form-card" style="display: none;">
+                    <h3>Client</h3>
+                    <form id="userFormData">
+                        <input type="hidden" id="userId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="userName">Identification number</label>
+                                <input type="text" id="userIdent" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userName">Name</label>
+                                <input type="text" id="userName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userAddress">Address</label>
+                                <input type="text" id="userAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userApartment">Apartment</label>
+                                <input type="text" id="userApartment" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userPhone">Phone</label>
+                                <input type="text" id="userPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail">Email</label>
+                                <input type="email" id="userEmail" required>
+                            </div>
+
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelUserForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Table of clients -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Identification</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Apartment</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sección de Productos -->
+            <div id="products" class="section">
+                <div class="section-header">
+                    <h2>Invoice management</h2>
+                </div>
+                
+        
+                <!-- Table of invoices -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice number</th>
+                                <th>Platform used</th>
+                                <th>Billing period</th>
+                                <th>invoiced amount</th>
+                                <th>Paid amount</th>
+                                <th>Identification of client</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!--Transactions section -->
+            <div id="purchases" class="section">
+                <div class="section-header">
+                    <h2>Transactions management</h2>
+                
+                <!-- Table of transactions -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Transaction id</th>
+                                <th>Date of transaction</th>
+                                <th>Transaction amount</th>
+                                <th>transaction status</th>
+                                <th>transaction type</th>
+                                <th>Invoice number</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchasesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Importación CSV -->
+    <div id="importModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📁 Import CSV</h3>
+                <span class="close" onclick="closeImportModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="csvFile">Select csv:</label>
+                    <input type="file" id="csvFile" accept=".csv" required>
+                </div>
+                <div class="form-group">
+                    <label for="targetTable">Target table:</label>
+                    <select id="targetTable" required>
+                        <option value="">Select table</option>
+                        <option value="users">Clients</option>
+                        <option value="products">Invoices</option>
+                        <option value="purchases">Transactions</option>
+                    </select>
+                </div>
+                <div class="modal-info">
+                    <h4>📋 Format required by table:</h4>
+                    <div class="format-info">
+                        <strong>Clients:</strong> Identification_number, name, address, apartment, phone, email<br>
+                        <strong>Invoices:</strong> Invoice_number, platform used, billing period, invoiced amount, paid amount, indentification of client<br>
+                        <strong>Transactions:</strong> Transaction_id, transaction date, transaction amount, transaction status, transaction type, number of invoice
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="handleImport()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
